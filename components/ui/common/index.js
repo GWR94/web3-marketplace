@@ -4,4 +4,4 @@ export { default as Hero } from "./hero";
 export { default as Breadcrumbs } from "./breadcrumbs";
 export { default as Modal } from "./modal";
 export { default as Button } from "./button";
-import { default as ActiveLink } from "./link";
+export { default as ActiveLink } from "./link";

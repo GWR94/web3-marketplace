@@ -1,6 +1,5 @@
 import { useWeb3 } from "@components/providers";
-import Link from "next/link";
-import { Button } from "@components/ui/common";
+import { ActiveLink, Button } from "@components/ui/common";
 import { useAccount } from "@components/hooks/web3";
 
 export default function Navbar() {
@@ -8,9 +7,10 @@ export default function Navbar() {
   const { account } = useAccount();
 
   const formatAddress = (account) => {
-    return `${account.data.substring(0, 4)}...${account.data.substring(
-      account.data.length - 4
-    )} ${account.isAdmin ? "(A)" : ""}`;
+    if (account.data)
+      return `${account.data.substring(0, 4)}...${account.data.substring(
+        account.data.length - 4
+      )} ${account.isAdmin ? "(A)" : ""}`;
   };
 
   return (
@@ -19,28 +19,28 @@ export default function Navbar() {
         <nav className="relative" aria-label="Global">
           <div className="flex justify-between items-center">
             <div>
-              <Link href="/">
+              <ActiveLink href="/">
                 <a className="font-medium mr-8 text-gray-500 hover:text-gray-900">
                   Home
                 </a>
-              </Link>
-              <Link href="/marketplace">
+              </ActiveLink>
+              <ActiveLink href="/marketplace">
                 <a className="font-medium mr-8 text-gray-500 hover:text-gray-900">
                   Marketplace
                 </a>
-              </Link>
-              <Link href="/">
+              </ActiveLink>
+              <ActiveLink href="/blog">
                 <a className="font-medium mr-8 text-gray-500 hover:text-gray-900">
-                  Blogs
+                  Blog
                 </a>
-              </Link>
+              </ActiveLink>
             </div>
             <div>
-              <Link href="/">
+              <ActiveLink href="/wishlist">
                 <a className="font-medium mr-8 text-gray-500 hover:text-gray-900">
                   Wishlist
                 </a>
-              </Link>
+              </ActiveLink>
               {isLoading ? (
                 <Button disabled disableHover>
                   Loading
