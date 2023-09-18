@@ -8,6 +8,7 @@ const {
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 import { setupHooks } from "./hooks/setupHooks";
+import { loadContract } from "@utils/loadContract";
 
 const Web3Context = createContext(null);
 
@@ -26,10 +27,11 @@ const Web3Provider = ({ children }) => {
 
       if (provider) {
         const web3 = new Web3(provider);
+        const contract = await loadContract("CourseMarketplace", web3);
         setWeb3API({
           provider,
           web3,
-          contract: null,
+          contract,
           isLoading: false,
           hooks: setupHooks(web3, provider),
         });
@@ -54,7 +56,8 @@ const Web3Provider = ({ children }) => {
                 method: "eth_requestAccounts",
               });
               console.log("Connected!");
-            } catch {
+            } catch (err) {
+              console.log(err);
               location.reload();
             }
           }

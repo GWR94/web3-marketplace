@@ -2,7 +2,7 @@ import { useETHPrice } from "@components/hooks/useETHPrice";
 import { Modal, Button } from "@components/ui/common";
 import React, { useEffect, useState } from "react";
 
-const OrderModal = ({ course, clearCourse }) => {
+const OrderModal = ({ course, clearCourse, onSubmit }) => {
   const defaultOrder = {
     price: "",
     email: "",
@@ -12,7 +12,7 @@ const OrderModal = ({ course, clearCourse }) => {
   const [isOpen, setOpen] = useState(false);
   const [order, setOrder] = useState(defaultOrder);
   const [updatePrice, setUpdatePrice] = useState(false);
-  const [terms, setTerms] = useState(false);
+  const [acceptedTerms, setTerms] = useState(false);
   const [error, setError] = useState("");
 
   const { eth } = useETHPrice();
@@ -24,12 +24,14 @@ const OrderModal = ({ course, clearCourse }) => {
         ...defaultOrder,
         price: eth.perItem,
       });
+      setTerms(false);
     }
   }, [course]);
 
   const handleClose = () => {
     setOpen(false);
     clearCourse();
+    setTerms(false);
     setOrder(defaultOrder);
   };
 
@@ -146,7 +148,7 @@ const OrderModal = ({ course, clearCourse }) => {
                 <label className="flex items-center mr-2">
                   <input
                     type="checkbox"
-                    value={terms}
+                    value={acceptedTerms}
                     onChange={({ target: { checked } }) => setTerms(checked)}
                     className="form-checkbox"
                   />
@@ -168,11 +170,13 @@ const OrderModal = ({ course, clearCourse }) => {
         <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex">
           <Button
             onClick={() => {
-              alert(JSON.stringify(order));
+              onSubmit(order);
               handleClose();
             }}
             disabled={
-              order.email !== order.confirmEmail || order.price == 0 || !terms
+              order.email !== order.confirmEmail ||
+              order.price == 0 ||
+              !acceptedTerms
             }
           >
             Submit
