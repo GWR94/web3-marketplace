@@ -25,11 +25,11 @@ const Card = ({ course, disabled, Footer }) => {
             {course.type}
           </div>
           <Link href={`/courses/${course.slug}`}>
-            <a className="block h-12 mt-1 text-lg leading-tight font-medium text-black hover:underline">
+            <a className="block h-12 mt-1 text-sm xs:text-lg leading-tight font-medium text-black hover:underline">
               {course.title}
             </a>
           </Link>
-          <p className="mt-2 text-gray-500">
+          <p className="mt-2 text-gray-500 text-sm xs:text-base">
             {expanded
               ? course.description
               : course.description.split(" ").slice(0, 12).join(" ")}{" "}

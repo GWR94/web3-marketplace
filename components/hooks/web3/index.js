@@ -14,10 +14,17 @@ export const useAccount = () => {
   };
 };
 
-export const useOwnedCourses = () => {
-  const res = useHooks((hooks) => hooks.useOwnedCourses)();
+export const useOwnedCourses = (...args) => {
+  const res = enhanceHook(useHooks((hooks) => hooks.useOwnedCourses)(...args));
   return {
-    ownedCourses: { data: res },
+    ownedCourses: { data: res.data },
+  };
+};
+
+export const useOwnedCourse = (...args) => {
+  const res = enhanceHook(useHooks((hooks) => hooks.useOwnedCourse)(...args));
+  return {
+    ownedCourse: { data: res.data },
   };
 };
 
@@ -31,9 +38,10 @@ export const useNetwork = () => {
 export const useWalletInfo = () => {
   const { account } = useAccount();
   const { network } = useNetwork();
+  const canPurchaseCourse = !!(account.data && network.isSupported);
   return {
     account,
     network,
-    canPurchase: !!(account.data && network.isSupported),
+    canPurchaseCourse,
   };
 };

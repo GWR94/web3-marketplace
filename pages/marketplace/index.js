@@ -9,68 +9,49 @@ import { MarketHeader } from "@components/ui/marketplace";
 import { useWeb3 } from "@components/providers";
 
 export default function Marketplace({ courses }) {
-  const { canPurchase, account } = useWalletInfo();
   const { web3, contract } = useWeb3();
-
-  const [course, setCourse] = useState(null);
+  const { canPurchaseCourse, account } = useWalletInfo();
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
   const purchaseCourse = async (order) => {
-    const hexCourseId = web3.utils.utf8ToHex(course.id);
-
+    const hexCourseId = web3.utils.utf8ToHex(selectedCourse.id);
     const orderHash = web3.utils.soliditySha3(
-      {
-        type: "bytes16",
-        value: hexCourseId,
-      },
-      {
-        type: "address",
-        value: account.data,
-      }
+      { type: "bytes16", value: hexCourseId },
+      { type: "address", value: account.data }
     );
     const emailHash = web3.utils.sha3(order.email);
-
-    // emailHash + emailHash
     const proof = web3.utils.soliditySha3(
-      {
-        type: "bytes32",
-        value: emailHash,
-      },
-      {
-        type: "bytes32",
-        value: orderHash,
-      }
+      { type: "bytes32", value: emailHash },
+      { type: "bytes32", value: orderHash }
     );
 
-    const price = web3.utils.toWei(String(order.price));
+    const value = web3.utils.toWei(String(order.price));
 
     try {
-      const res = await contract.methods
+      const result = await contract.methods
         .purchaseCourse(hexCourseId, proof)
-        .send({ from: account.data, value: price });
-      console.log(res);
-    } catch (err) {
-      // console.error(err);
-      console.log("Purchase course: Operation has failed.");
+        .send({ from: account.data, value });
+      console.log(result);
+    } catch {
+      console.error("Purchase course: Operation has failed.");
     }
   };
 
   return (
     <>
-      <div className="py-4">
-        <MarketHeader />
-      </div>
+      <MarketHeader />
       <CourseList courses={courses}>
         {(course) => (
           <CourseCard
-            course={course}
             key={course.id}
-            disabled={!canPurchase}
+            course={course}
+            disabled={!canPurchaseCourse}
             Footer={() => (
               <div className="mt-4">
                 <Button
+                  onClick={() => setSelectedCourse(course)}
+                  disabled={!canPurchaseCourse}
                   variant="lightPurple"
-                  disabled={!canPurchase}
-                  onClick={() => setCourse(course)}
                 >
                   Purchase
                 </Button>
@@ -79,11 +60,11 @@ export default function Marketplace({ courses }) {
           />
         )}
       </CourseList>
-      {course && (
+      {selectedCourse && (
         <OrderModal
+          course={selectedCourse}
           onSubmit={purchaseCourse}
-          course={course}
-          clearCourse={() => setCourse(null)}
+          clearCourse={() => setSelectedCourse(null)}
         />
       )}
     </>

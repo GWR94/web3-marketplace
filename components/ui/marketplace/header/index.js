@@ -20,9 +20,13 @@ const LINKS = [
 const Header = () => {
   return (
     <>
-      <WalletBar />
-      <EthRates />
-      <div className="flex flex-row-reverse py-4 px-4 sm:px-6 lg:px-8">
+      <div className="pt-4">
+        <WalletBar />
+      </div>
+      <div className="flex align-middle justify-center">
+        <EthRates />
+      </div>
+      <div className="flex flex-row-reverse py-4 sm:px-6 lg:px-8">
         <Breadcrumbs items={LINKS} />
       </div>
     </>

@@ -8,7 +8,7 @@ const NETWORKS = {
   5: "Goerli Test Network",
   42: "Kovan Test Network",
   56: "Binance Smart Chain",
-  1337: "Ganache Test Network",
+  1337: "Ganache",
 };
 
 const targetNetwork = NETWORKS[process.env.NEXT_PUBLIC_TARGET_CHAIN_ID];
@@ -24,14 +24,14 @@ export const handler = (web3, provider) => () => {
 
   useEffect(() => {
     provider &&
-      provider.on("chainChanged", (chainId) =>
-        mutate(NETWORKS[parseInt(chainId, 16)])
-      );
-  }, []);
+      provider.on("chainChanged", (chainId) => {
+        mutate(NETWORKS[parseInt(chainId, 16)]);
+      });
+  }, [web3]);
 
   return {
-    mutate,
     data,
+    mutate,
     target: targetNetwork,
     isSupported: data === targetNetwork,
     ...rest,

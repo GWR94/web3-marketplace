@@ -6,49 +6,45 @@ export default function EthRates() {
   const { eth } = useETHPrice();
 
   return (
-    <div className="grid grid-cols-4">
-      <div className="flex flex-1 items-stretch text-center">
-        <div className="p-10 border drop-shadow rounded-md">
-          <div className="flex item-center">
-            {eth.data ? (
-              <>
-                <Image
-                  layout="fixed"
-                  height="35"
-                  width="35"
-                  src="/small-eth.webp"
-                  alt="Ether"
-                />
-                <span className="text-2xl font-bold">= ${eth.data}</span>
-              </>
-            ) : (
-              <Loader />
-            )}
-          </div>
-          <p className="text-xl text-gray-500">Current eth Price</p>
+    <div className="flex flex-col xs:flex-row text-center mt-4">
+      <div className="p-6 border drop-shadow rounded-md xs:mr-2 my-1">
+        <div className="flex item-center justify-center">
+          {eth.data ? (
+            <>
+              <Image
+                layout="fixed"
+                height="35"
+                width="35"
+                src="/small-eth.webp"
+                alt="Ether"
+              />
+              <span className="text-lg font-bold">= ${eth.data}</span>
+            </>
+          ) : (
+            <Loader />
+          )}
         </div>
+        <p className="text-lg text-gray-500">Current ETH Price</p>
       </div>
-      <div className="flex flex-1 items-stretch text-center">
-        <div className="p-10 border drop-shadow orunded-md">
-          <div className="flex item-center">
-            {eth.data ? (
-              <>
-                <span className="text-2xl font-bold">{eth.perItem}</span>
-                <Image
-                  layout="fixed"
-                  height="35"
-                  width="35"
-                  src="/small-eth.webp"
-                  alt="Ether"
-                />
-                <span className="text-2xl font-bold">= {COURSE_PRICE}</span>
-              </>
-            ) : (
-              <Loader />
-            )}
-          </div>
-          <p className="text-xl text-gray-500">Price per course</p>
+      <div className="p-6 border drop-shadow rounded-md my-1">
+        <div className="flex item-center justify-center">
+          {eth.data ? (
+            <>
+              <span className="text-lg font-bold">{eth.perItem}</span>
+              <Image
+                layout="fixed"
+                height="35"
+                width="35"
+                src="/small-eth.webp"
+                alt="Ether"
+              />
+              <span className="text-lg font-bold">= ${COURSE_PRICE}</span>
+            </>
+          ) : (
+            <Loader />
+          )}
         </div>
+        <p className="text-lg text-gray-500">Price per course</p>
       </div>
     </div>
   );
