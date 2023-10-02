@@ -1,9 +1,25 @@
 import { useHooks } from "@components/providers/web3";
 
+const _isEmpty = (data) => {
+  return (
+    data == null ||
+    data === "" ||
+    (Array.isArray(data) && data.length === 0) ||
+    (data.constructor === Object && Object.keys(data).length === 0)
+  );
+};
 const enhanceHook = (swrRes) => {
+  const { data, error } = swrRes;
+  const hasInitialResponse = !!(data || error);
+  console.log(hasInitialResponse);
+  const isEmpty = hasInitialResponse && _isEmpty(data);
+
+  // console.log(swrRes);
+
   return {
     ...swrRes,
-    hasInitialResponse: swrRes.data || swrRes.error,
+    isEmpty,
+    hasInitialResponse,
   };
 };
 
@@ -15,16 +31,20 @@ export const useAccount = () => {
 };
 
 export const useOwnedCourses = (...args) => {
-  const res = enhanceHook(useHooks((hooks) => hooks.useOwnedCourses)(...args));
+  const ownedCourses = enhanceHook(
+    useHooks((hooks) => hooks.useOwnedCourses)(...args)
+  );
   return {
-    ownedCourses: { data: res.data },
+    ownedCourses,
   };
 };
 
 export const useOwnedCourse = (...args) => {
-  const res = enhanceHook(useHooks((hooks) => hooks.useOwnedCourse)(...args));
+  const ownedCourse = enhanceHook(
+    useHooks((hooks) => hooks.useOwnedCourse)(...args)
+  );
   return {
-    ownedCourse: { data: res.data },
+    ownedCourse,
   };
 };
 

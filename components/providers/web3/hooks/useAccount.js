@@ -12,7 +12,15 @@ export const handler = (web3, provider) => () => {
     },
     async () => {
       const accounts = await web3.eth.getAccounts();
-      return accounts[0];
+      const account = accounts[0];
+
+      if (!account) {
+        throw new Error(
+          "Cannot retrieve an account. Please refresh the browser."
+        );
+      }
+
+      return account;
     }
   );
 
