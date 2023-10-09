@@ -11,10 +11,7 @@ const _isEmpty = (data) => {
 const enhanceHook = (swrRes) => {
   const { data, error } = swrRes;
   const hasInitialResponse = !!(data || error);
-  console.log(hasInitialResponse);
   const isEmpty = hasInitialResponse && _isEmpty(data);
-
-  // console.log(swrRes);
 
   return {
     ...swrRes,
@@ -45,6 +42,15 @@ export const useOwnedCourse = (...args) => {
   );
   return {
     ownedCourse,
+  };
+};
+
+export const useManagedCourses = (...args) => {
+  const managedCourses = enhanceHook(
+    useHooks((hooks) => hooks.useManagedCourses)(...args)
+  );
+  return {
+    managedCourses,
   };
 };
 

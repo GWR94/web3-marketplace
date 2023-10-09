@@ -13,6 +13,7 @@ export const handler = (web3, contract) => (course, account) => {
         .call();
 
       if (ownedCourse.owner === "0x0000000000000000000000000000000000000000")
+        // no owner
         return null;
       return normalizeOwnedCourse(web3)(course, ownedCourse);
     }

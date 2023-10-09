@@ -30,7 +30,9 @@ export default function EthRates() {
         <div className="flex item-center justify-center">
           {eth.data ? (
             <>
-              <span className="text-lg font-bold">{eth.perItem}</span>
+              <span className="text-lg font-bold">
+                {Number.parseFloat(eth.perItem).toFixed(2)}
+              </span>
               <Image
                 layout="fixed"
                 height="35"

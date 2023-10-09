@@ -25,9 +25,13 @@ export const handler = (web3, provider) => () => {
   );
 
   useEffect(() => {
-    provider &&
-      provider.on("accountsChanged", (accounts) => mutate(accounts[0] ?? null));
-  }, [provider]);
+    const mutator = (accounts) => mutate(accounts[0] ?? null);
+    provider?.on("accountsChanged", mutator);
+    return () => {
+      // remove listener when unmounted
+      provider?.removeListener("accountsChanged", mutator);
+    };
+  }, [mutate]);
 
   return {
     data,

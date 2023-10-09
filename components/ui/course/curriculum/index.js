@@ -1,3 +1,4 @@
+import { Loader } from "@components/ui/common";
 import Link from "next/link";
 
 const lectures = [
@@ -9,7 +10,7 @@ const lectures = [
   "Safe operator",
 ];
 
-export default function Curriculum({ locked, courseState }) {
+export default function Curriculum({ locked, courseState, isLoading }) {
   const statusClass =
     "px-2 inline-flex text-xs leading-5 font-semibold rounded-full";
   return (
@@ -62,7 +63,9 @@ export default function Curriculum({ locked, courseState }) {
                         </span>
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-right text-xs font-small">
-                        {locked ? (
+                        {isLoading ? (
+                          <Loader />
+                        ) : locked ? (
                           <>
                             {courseState == "deactivated" && (
                               <Link href="/marketplace">
