@@ -1,4 +1,4 @@
-import { addSpaceToCaps, capitalize } from "@utils/capitalize";
+import { addSpaceToCaps, capitalize } from "@utils/textUtils";
 
 export default function ManagedCourseCard({ course, children }) {
   const Item = ({ title, value, className }) => (
@@ -9,6 +9,7 @@ export default function ManagedCourseCard({ course, children }) {
       </div>
     </div>
   );
+
   return (
     <div className="bg-white border shadow overflow-hidden sm:rounded-lg mb-3">
       <div className="flex">
@@ -16,7 +17,7 @@ export default function ManagedCourseCard({ course, children }) {
           {Object.keys(course).map((key, i) => (
             <Item
               key={i}
-              className={i % 2 === 0 && "bg-gray-50"}
+              className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}
               title={addSpaceToCaps(capitalize(key))}
               value={`${capitalize(course[key])} ${key === "price" ? "Ξ" : ""}`}
             />

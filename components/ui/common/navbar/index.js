@@ -6,11 +6,11 @@ export default function Navbar() {
   const { connect, isLoading, requireInstall } = useWeb3();
   const { account } = useAccount();
 
-  const formatAddress = (account) => {
-    if (account.data)
-      return `${account.data.substring(0, 4)}...${account.data.substring(
-        account.data.length - 4
-      )} ${account.isAdmin ? "(A)" : ""}`;
+  const formatAddress = ({ data, isAdmin }) => {
+    if (data)
+      return `${data.substring(0, 4)}...${data.substring(data.length - 4)} ${
+        isAdmin ? "(A)" : ""
+      }`;
   };
 
   return (
