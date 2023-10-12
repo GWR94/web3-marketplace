@@ -1,13 +1,13 @@
 import { useAdmin, useManagedCourses } from "@components/hooks/web3";
 import { useWeb3 } from "@components/providers";
-import { Message, VerifyInput } from "@components/ui/common";
+import { Button, Message, VerifyInput } from "@components/ui/common";
 import { CourseFilter, ManagedCourseCard } from "@components/ui/course";
 import { BaseLayout } from "@components/ui/layout";
 import { MarketHeader } from "@components/ui/marketplace";
 import { useState } from "react";
 
 export default function ManagedCourses() {
-  const { web3 } = useWeb3();
+  const { web3, contract } = useWeb3();
   const { account } = useAdmin({ redirectTo: "/marketplace" });
   const { managedCourses } = useManagedCourses(account);
   const [proofedOwnership, setProofed] = useState({});
@@ -22,6 +22,26 @@ export default function ManagedCourses() {
       ...proofedOwnership,
       [hash]: proof === proofToCheck,
     });
+  };
+
+  const activateCourse = async (courseHash) => {
+    try {
+      await contract.methods.activateCourse(courseHash).send({
+        from: account.data,
+      });
+    } catch (e) {
+      console.error(e.message);
+    }
+  };
+
+  const deactivateCourse = async (courseHash) => {
+    try {
+      await contract.methods.deactivateCourse(courseHash).send({
+        from: account.data,
+      });
+    } catch (e) {
+      console.error(e.message);
+    }
   };
 
   if (!account.isAdmin) return null;
@@ -48,6 +68,22 @@ export default function ManagedCourses() {
             {proofedOwnership[course.hash] === false && (
               <div>
                 <Message type="danger">Wrong Proof!</Message>
+              </div>
+            )}
+            {course.state === "purchased" && (
+              <div className="mt-2">
+                <Button
+                  variant="green"
+                  onClick={() => activateCourse(course.hash)}
+                >
+                  Activate
+                </Button>
+                <Button
+                  variant="red"
+                  onClick={() => deactivateCourse(course.hash)}
+                >
+                  Deactivate
+                </Button>
               </div>
             )}
           </ManagedCourseCard>

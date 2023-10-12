@@ -1,3 +1,9 @@
 {
+  "env": {
+    // ...
+    "mocha": true, // for test files
+    "truffle/globals": true // same as "truffle/truffle": true
+  },
+  "plugins": ["mocha", "truffle"],
   "extends": ["next/core-web-vitals", "eslint:recommended"]
 }

@@ -4,7 +4,7 @@ import Button from "../button";
 const VerifyFilter = ({ handleVerifyCourse }) => {
   const [email, setEmail] = useState("");
   return (
-    <div className="flex mr-2 relative rounded-md">
+    <div className="flex mr-2 mb-4 relative rounded-md">
       <input
         type="text"
         name="account"
