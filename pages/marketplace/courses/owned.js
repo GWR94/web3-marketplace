@@ -1,4 +1,4 @@
-import { useAccount, useOwnedCourses } from "@components/hooks/web3";
+import { useOwnedCourses, useWalletInfo } from "@components/hooks/web3";
 import { useWeb3 } from "@components/providers";
 import { Button, Loader, Message } from "@components/ui/common";
 import { OwnedCourseCard } from "@components/ui/course";
@@ -9,9 +9,9 @@ import { useRouter } from "next/dist/client/router";
 import Link from "next/link";
 
 export default function OwnedCourses({ courses }) {
-  const { account } = useAccount();
-  const { requireInstall, isLoading } = useWeb3();
   const router = useRouter();
+  const { requireInstall, isLoading } = useWeb3();
+  const { account, network } = useWalletInfo();
   const { ownedCourses } = useOwnedCourses(courses, account.data);
   return (
     <>

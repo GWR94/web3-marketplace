@@ -2,7 +2,7 @@ import { useETHPrice } from "@components/hooks/useETHPrice";
 import { Modal, Button } from "@components/ui/common";
 import React, { useEffect, useState } from "react";
 
-const OrderModal = ({ course, clearCourse, onSubmit }) => {
+const OrderModal = ({ course, onClose, onSubmit, isNewPurchase }) => {
   const defaultOrder = {
     price: "",
     email: "",
@@ -30,7 +30,7 @@ const OrderModal = ({ course, clearCourse, onSubmit }) => {
 
   const handleClose = () => {
     setOpen(false);
-    clearCourse();
+    onClose();
     setTerms(false);
     setOrder(defaultOrder);
   };
@@ -42,12 +42,16 @@ const OrderModal = ({ course, clearCourse, onSubmit }) => {
           <div className="sm:flex sm:items-start">
             <div className="mt-3 sm:mt-0 sm:ml-4 sm:text-left">
               <h3
-                className="mb-7 text-lg font-bold leading-6 text-gray-900"
+                className="mb-5 text-lg font-bold leading-6 text-gray-900"
                 id="modal-title"
               >
                 {course.title}
               </h3>
-              <div className="mt-1 relative rounded-md">
+              <div
+                className={`mt-1 relative rounded-md ${
+                  !isNewPurchase && "mb-4"
+                }`}
+              >
                 <div className="mb-1">
                   <label className="mb-2 font-bold">Price Ξ</label>
                 </div>
@@ -87,63 +91,68 @@ const OrderModal = ({ course, clearCourse, onSubmit }) => {
                 </div>
                 <p className="text-xs text-gray-700">
                   Price will be verified at the time of the order. If the price
-                  will be lower, order can be declined (+- 2% slippage is
+                  will be lower, order can be declined (nominal slippage is
                   allowed)
                 </p>
               </div>
-              <div className="mt-2 relative rounded-md">
-                <div className="mb-1">
-                  <label className="mb-2 font-bold">Email</label>
-                </div>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  onBlur={() =>
-                    setError(
-                      order.email !== order.confirmEmail
-                        ? "Email and repeat email addresses do not match."
-                        : ""
-                    )
-                  }
-                  onChange={(e) =>
-                    setOrder({ ...order, email: e.target.value.trim() })
-                  }
-                  className="w-80 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm border-gray-300 rounded-md"
-                  placeholder="john-doe@example.com"
-                />
-                <p className="text-xs text-gray-700 mt-1">
-                  It&apos;s important to fill a correct email, otherwise the
-                  order cannot be verified. We are not storing your email
-                  anywhere
-                </p>
-              </div>
-              <div className="my-2 relative rounded-md">
-                <div className="mb-1">
-                  <label className="mb-2 font-bold">Repeat Email</label>
-                </div>
-                <input
-                  type="email"
-                  name="confirmationEmail"
-                  id="confirmationEmail"
-                  onBlur={() =>
-                    setError(
-                      order.email !== order.confirmEmail
-                        ? "Email and repeat email addresses do not match."
-                        : ""
-                    )
-                  }
-                  onChange={(e) => {
-                    const confirmEmail = e.target.value.trim();
-                    setOrder({
-                      ...order,
-                      confirmEmail,
-                    });
-                  }}
-                  className="w-80 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm border-gray-300 rounded-md"
-                  placeholder="john-doe@example.com"
-                />
-              </div>
+              {isNewPurchase && (
+                <>
+                  <div className="mt-2 relative rounded-md">
+                    <div className="mb-1">
+                      <label className="mb-2 font-bold">Email</label>
+                    </div>
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      onBlur={() =>
+                        setError(
+                          order.confirmEmail.length &&
+                            order.email !== order.confirmEmail
+                            ? "Email and repeat email addresses do not match."
+                            : ""
+                        )
+                      }
+                      onChange={(e) =>
+                        setOrder({ ...order, email: e.target.value.trim() })
+                      }
+                      className="w-80 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm border-gray-300 rounded-md"
+                      placeholder="john-doe@example.com"
+                    />
+                    <p className="text-xs text-gray-700 mt-1">
+                      It&apos;s important to fill a correct email, otherwise the
+                      order cannot be verified. We are not storing your email
+                      anywhere
+                    </p>
+                  </div>
+                  <div className="my-2 relative rounded-md">
+                    <div className="mb-1">
+                      <label className="mb-2 font-bold">Repeat Email</label>
+                    </div>
+                    <input
+                      type="email"
+                      name="confirmationEmail"
+                      id="confirmationEmail"
+                      onBlur={() =>
+                        setError(
+                          order.email !== order.confirmEmail
+                            ? "Email and repeat email addresses do not match."
+                            : ""
+                        )
+                      }
+                      onChange={(e) => {
+                        const confirmEmail = e.target.value.trim();
+                        setOrder({
+                          ...order,
+                          confirmEmail,
+                        });
+                      }}
+                      className="w-80 focus:ring-indigo-500 shadow-md focus:border-indigo-500 block pl-7 p-4 sm:text-sm border-gray-300 rounded-md"
+                      placeholder="john-doe@example.com"
+                    />
+                  </div>
+                </>
+              )}
               <div className="text-xs text-gray-700 flex">
                 <label className="flex items-center mr-2">
                   <input
@@ -170,18 +179,21 @@ const OrderModal = ({ course, clearCourse, onSubmit }) => {
         <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex">
           <Button
             onClick={() => {
-              onSubmit(order);
+              onSubmit();
               handleClose();
             }}
+            size="sm"
             disabled={
-              order.email !== order.confirmEmail ||
-              order.price == 0 ||
-              !acceptedTerms
+              isNewPurchase
+                ? order.email !== order.confirmEmail ||
+                  order.price == 0 ||
+                  !acceptedTerms
+                : order.price === 0 || !acceptedTerms
             }
           >
             Submit
           </Button>
-          <Button variant="red" onClick={handleClose}>
+          <Button variant="red" size="sm" onClick={handleClose}>
             Cancel
           </Button>
         </div>

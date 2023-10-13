@@ -9,8 +9,7 @@ export default function WalletBar() {
     <section className="text-white bg-indigo-600 rounded-lg">
       <div className="p-8">
         <h1 className="text-base xs:text-xl break-words">
-          Hello, {account.data?.substring(0, 4)}...
-          {account.data?.substring(account.data.length - 4)}.
+          Hello, {account.data}.
         </h1>
         <h2 className="subtitle mb-5 text-sm xs:text-base">
           I hope you are having a great day!

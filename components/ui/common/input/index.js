@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import Button from "../button";
 
+// BEFORE TX BALANCE => 13839171251600000000
+// GAS COST          => 132997 * 20000000000 = 2659940000000000 (0.00265994 ETH)
+// GAS + VALUE SENT  => 1.00265994 ETH
+
+// AFTER TX BALANCE  => 12836030071600000000
+
 const VerifyFilter = ({ handleVerifyCourse }) => {
   const [email, setEmail] = useState("");
   return (

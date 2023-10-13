@@ -1,6 +1,7 @@
-import { useHooks, useWeb3 } from "@components/providers/web3";
-import { useRouter } from "next/dist/client/router";
+import { useHooks } from "@components/providers/web3";
 import { useEffect } from "react";
+import { useWeb3 } from "@components/providers";
+import { useRouter } from "next/router";
 
 const _isEmpty = (data) => {
   return (
@@ -10,6 +11,7 @@ const _isEmpty = (data) => {
     (data.constructor === Object && Object.keys(data).length === 0)
   );
 };
+
 const enhanceHook = (swrRes) => {
   const { data, error } = swrRes;
   const hasInitialResponse = !!(data || error);
@@ -22,19 +24,17 @@ const enhanceHook = (swrRes) => {
   };
 };
 
-export const useAccount = () => {
-  const account = enhanceHook(useHooks((hooks) => hooks.useAccount)());
+export const useNetwork = () => {
+  const swrRes = enhanceHook(useHooks((hooks) => hooks.useNetwork)());
   return {
-    account,
+    network: swrRes,
   };
 };
 
-export const useOwnedCourses = (...args) => {
-  const ownedCourses = enhanceHook(
-    useHooks((hooks) => hooks.useOwnedCourses)(...args)
-  );
+export const useAccount = () => {
+  const swrRes = enhanceHook(useHooks((hooks) => hooks.useAccount)());
   return {
-    ownedCourses,
+    account: swrRes,
   };
 };
 
@@ -52,41 +52,51 @@ export const useAdmin = ({ redirectTo }) => {
       router.push(redirectTo);
     }
   }, [account]);
+
   return { account };
 };
 
+export const useOwnedCourses = (...args) => {
+  const swrRes = enhanceHook(
+    useHooks((hooks) => hooks.useOwnedCourses)(...args)
+  );
+
+  return {
+    ownedCourses: swrRes,
+  };
+};
+
 export const useOwnedCourse = (...args) => {
-  const ownedCourse = enhanceHook(
+  const swrRes = enhanceHook(
     useHooks((hooks) => hooks.useOwnedCourse)(...args)
   );
+
   return {
-    ownedCourse,
+    ownedCourse: swrRes,
   };
 };
 
 export const useManagedCourses = (...args) => {
-  const managedCourses = enhanceHook(
+  const swrRes = enhanceHook(
     useHooks((hooks) => hooks.useManagedCourses)(...args)
   );
-  return {
-    managedCourses,
-  };
-};
 
-export const useNetwork = () => {
-  const network = enhanceHook(useHooks((hooks) => hooks.useNetwork)());
   return {
-    network,
+    managedCourses: swrRes,
   };
 };
 
 export const useWalletInfo = () => {
   const { account } = useAccount();
   const { network } = useNetwork();
-  const canPurchaseCourse = !!(account.data && network.isSupported);
+
+  const isConnecting =
+    !account.hasInitialResponse && !network.hasInitialResponse;
+
   return {
     account,
     network,
-    canPurchaseCourse,
+    isConnecting,
+    hasConnectedWallet: !!(account.data && network.isSupported),
   };
 };

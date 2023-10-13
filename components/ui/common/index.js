@@ -4,6 +4,7 @@ export { default as Hero } from "./hero";
 export { default as Breadcrumbs } from "./breadcrumbs";
 export { default as Modal } from "./modal";
 export { default as Button } from "./button";
+export { default as Chip } from "./chip";
 export { default as ActiveLink } from "./link";
 export { default as VerifyInput } from "./input";
 export { default as Message } from "./message";

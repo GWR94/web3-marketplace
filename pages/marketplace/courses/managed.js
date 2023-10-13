@@ -24,9 +24,9 @@ export default function ManagedCourses() {
     });
   };
 
-  const activateCourse = async (courseHash) => {
+  const changeCourseState = async (courseHash, method) => {
     try {
-      await contract.methods.activateCourse(courseHash).send({
+      await contract.methods[method](courseHash).send({
         from: account.data,
       });
     } catch (e) {
@@ -34,14 +34,12 @@ export default function ManagedCourses() {
     }
   };
 
+  const activateCourse = async (courseHash) => {
+    changeCourseState(courseHash, "activateCourse");
+  };
+
   const deactivateCourse = async (courseHash) => {
-    try {
-      await contract.methods.deactivateCourse(courseHash).send({
-        from: account.data,
-      });
-    } catch (e) {
-      console.error(e.message);
-    }
+    changeCourseState(courseHash, "deactivateCourse");
   };
 
   if (!account.isAdmin) return null;

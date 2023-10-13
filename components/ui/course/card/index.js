@@ -1,9 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
+import { Chip } from "@components/ui/common";
 
-const Card = ({ course, disabled, Footer }) => {
+const Card = ({ course, disabled, Footer, state }) => {
   const [expanded, setExpanded] = useState(false);
+
   return (
     <div
       key={course.id}
@@ -21,15 +23,28 @@ const Card = ({ course, disabled, Footer }) => {
           />
         </div>
         <div className="flex-2 p-8 pb-4">
-          <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
-            {course.type}
+          <div className="inline-flex align-baseline">
+            <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
+              {course.type}
+            </div>
+            <div>
+              {(state === "activated" && (
+                <Chip color="green" value="Activated" />
+              )) ||
+                (state === "deactivated" && (
+                  <Chip color="red" value="Deactivated" />
+                )) ||
+                (state === "purchased" && <Chip value="Purchased" />)}
+            </div>
           </div>
-          <Link href={`/courses/${course.slug}`}>
-            <a className="block h-12 mt-1 text-sm xs:text-lg leading-tight font-medium text-black hover:underline">
-              {course.title}
-            </a>
-          </Link>
-          <p className="mt-2 text-gray-500 text-sm xs:text-base">
+          <div>
+            <Link href={`/courses/${course.slug}`}>
+              <a className="block h-12 mt-1 text-sm sm:text-base xs:text-lg leading-tight font-medium text-black hover:underline">
+                {course.title}
+              </a>
+            </Link>
+          </div>
+          <p className="my-2 text-gray-500 text-sm xs:text-base">
             {expanded
               ? course.description
               : course.description.split(" ").slice(0, 12).join(" ")}{" "}
@@ -42,7 +57,11 @@ const Card = ({ course, disabled, Footer }) => {
               </span>
             )}
           </p>
-          {Footer && <Footer />}
+          {Footer && (
+            <div className="flex justify-end">
+              <Footer />
+            </div>
+          )}
         </div>
       </div>
     </div>
