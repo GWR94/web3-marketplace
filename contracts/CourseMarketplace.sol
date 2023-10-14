@@ -112,6 +112,7 @@ contract CourseMarketplace {
         }
 
         (bool success, ) = course.owner.call{value: course.price}("");
+        // require(-this to be true-, -Otherwise this string will be returned as a failure-)
         require(success, "Transfer failed!");
 
         course.state = State.Deactivated;

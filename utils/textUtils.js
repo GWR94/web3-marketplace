@@ -1,5 +1,5 @@
 export const capitalize = (string) => {
-  return `${string.charAt(0).toUpperCase()}${string.slice(1)}`;
+  return `${string.charAt(0).toUpperCase()}${string.slice(1)}`.trim();
 };
 
 export const addSpaceToCaps = (string) => {
@@ -8,5 +8,5 @@ export const addSpaceToCaps = (string) => {
   for (const char of chars) {
     str += char === char.toUpperCase() ? ` ${char}` : char;
   }
-  return str;
+  return str.trim();
 };

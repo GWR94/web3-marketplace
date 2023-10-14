@@ -16,6 +16,7 @@ export default function Marketplace({ courses }) {
   const [isNewPurchase, setNewPurchase] = useState(true);
 
   const purchaseCourse = async (order) => {
+    console.log(order);
     const hexCourseId = web3.utils.utf8ToHex(selectedCourse.id);
     const orderHash = web3.utils.soliditySha3(
       { type: "bytes16", value: hexCourseId },
@@ -144,7 +145,7 @@ export default function Marketplace({ courses }) {
         <OrderModal
           course={selectedCourse}
           isNewPurchase={isNewPurchase}
-          onSubmit={purchaseCourse}
+          onSubmit={(order) => purchaseCourse(order)}
           onClose={() => {
             setSelectedCourse(null);
             setNewPurchase(true);

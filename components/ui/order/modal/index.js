@@ -179,7 +179,7 @@ const OrderModal = ({ course, onClose, onSubmit, isNewPurchase }) => {
         <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex">
           <Button
             onClick={() => {
-              onSubmit();
+              onSubmit(order);
               handleClose();
             }}
             size="sm"
