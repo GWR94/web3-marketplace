@@ -294,5 +294,125 @@ describe("Course Marketplace Tests", () => {
         );
       });
     });
+    describe("Receive funds", () => {
+      it("should have transacted funds", async () => {
+        const value = "100000000000000000";
+        const beforeTxFunds = await getBalance(_contract.address);
+        await web3.eth.sendTransaction({
+          from: buyer,
+          to: _contract.address,
+          value,
+        });
+        const afterTxFunds = await getBalance(_contract.address);
+        assert.equal(
+          afterTxFunds,
+          toBn(beforeTxFunds).add(toBn(value)).toString(),
+          "Contract address showing incorrect balance after TX"
+        );
+      });
+    });
+    describe("Withdraw funds", () => {
+      const value = "100000000000000000";
+      const overLimitFunds = "99999900000000000000000";
+      let currentOwner;
+      before(async () => {
+        currentOwner = await _contract.getContractOwner();
+        await web3.eth.sendTransaction({
+          from: buyer,
+          to: _contract.address,
+          value,
+        });
+      });
+
+      it("should fail when withdrawing with NOT owner address", async () => {
+        const funds = "10000000000000000";
+        await catchRevert(_contract.withdraw(funds, { from: buyer }));
+      });
+
+      it("should fail when withdrawing OVER limit funds", async () => {
+        await catchRevert(
+          _contract.withdraw(overLimitFunds, { from: currentOwner })
+        );
+      });
+
+      it("should be able to withdraw 0.1 ETH with withdraw", async () => {
+        const ownerBeforeTxFunds = await getBalance(currentOwner);
+        const contractBeforeTxFunds = await getBalance(_contract.address);
+        const result = await _contract.withdraw(value, {
+          from: currentOwner,
+        });
+        const ownerAfterTxFunds = await getBalance(currentOwner);
+        const contractAfterTxFunds = await getBalance(_contract.address);
+        const gas = await getGas(result);
+
+        assert.equal(
+          ownerAfterTxFunds,
+          toBn(ownerBeforeTxFunds).sub(gas).add(toBn(value)).toString(),
+          "Owner address showing incorrect balance after TX"
+        );
+        assert.equal(
+          contractAfterTxFunds,
+          toBn(contractBeforeTxFunds).sub(toBn(value)).toString(),
+          "Contract address showing incorrect balance after TX"
+        );
+      });
+    });
+    describe("Emergency Withdraw funds", () => {
+      let currentOwner;
+      before(async () => {
+        currentOwner = await _contract.getContractOwner();
+      });
+
+      it("should fail when the contract is not stopped", async () => {
+        await catchRevert(_contract.emergencyWithdraw({ from: currentOwner }));
+      });
+
+      const addedFunds = "100000000000000000"; // 1 ETH
+
+      it("should fail when sender address is NOT owner address", async () => {
+        await _contract.stopContract({ from: currentOwner });
+        await catchRevert(_contract.emergencyWithdraw({ from: buyer }));
+      });
+
+      it("should withdraw all contract funds when sender address is owner", async () => {
+        await _contract.stopContract({ from: currentOwner });
+        await web3.eth.sendTransaction({
+          from: buyer,
+          to: _contract.address,
+          value: addedFunds,
+        });
+        const ownerBeforeTxFunds = await getBalance(currentOwner);
+        const contractBeforeTxFunds = await getBalance(_contract.address);
+        const result = await _contract.emergencyWithdraw({
+          from: currentOwner,
+        });
+        const ownerAfterTxFunds = await getBalance(currentOwner);
+        const contractAfterTxFunds = await getBalance(_contract.address);
+        const gas = await getGas(result);
+
+        assert.equal(
+          ownerAfterTxFunds,
+          toBn(ownerBeforeTxFunds)
+            .add(toBn(contractBeforeTxFunds))
+            .sub(gas)
+            .toString(),
+          "Owner address showing incorrect balance after TX"
+        );
+        assert.equal(
+          "0",
+          contractAfterTxFunds.toString(),
+          "Contract address showing incorrect balance after TX"
+        );
+      });
+
+      // it("should have a contract balance of 0", async () => {
+      //   const contractBalance = await getBalance(_contract.address);
+      //   assert.equal(
+      //     toBn(contractBalance),
+      //     0,
+      //     "Contract balance should be zero, it is NOT."
+      //   );
+      // });
+    });
   });
 });
