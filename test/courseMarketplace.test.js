@@ -37,7 +37,7 @@ describe("Course Marketplace Tests", () => {
       "0x0000000000000000000000000000313000000000000000000000000000003130";
     const proof2 =
       "0x0000000000000000000000000000213000000000000000000000000000002130";
-    const value = "900000000";
+    const value = "1";
     let _contract = null;
     let contractOwner = null;
     let buyer = null;
@@ -294,6 +294,7 @@ describe("Course Marketplace Tests", () => {
         );
       });
     });
+
     describe("Receive funds", () => {
       it("should have transacted funds", async () => {
         const value = "100000000000000000";
@@ -311,6 +312,7 @@ describe("Course Marketplace Tests", () => {
         );
       });
     });
+
     describe("Withdraw funds", () => {
       const value = "100000000000000000";
       const overLimitFunds = "99999900000000000000000";
@@ -357,10 +359,15 @@ describe("Course Marketplace Tests", () => {
         );
       });
     });
+
     describe("Emergency Withdraw funds", () => {
       let currentOwner;
       before(async () => {
         currentOwner = await _contract.getContractOwner();
+      });
+
+      after(async () => {
+        await _contract.resumeContract({ from: currentOwner });
       });
 
       it("should fail when the contract is not stopped", async () => {
@@ -387,7 +394,6 @@ describe("Course Marketplace Tests", () => {
           from: currentOwner,
         });
         const ownerAfterTxFunds = await getBalance(currentOwner);
-        const contractAfterTxFunds = await getBalance(_contract.address);
         const gas = await getGas(result);
 
         assert.equal(
@@ -398,21 +404,73 @@ describe("Course Marketplace Tests", () => {
             .toString(),
           "Owner address showing incorrect balance after TX"
         );
+      });
+
+      it("should have a contract balance of 0", async () => {
+        const contractBalance = await getBalance(_contract.address);
         assert.equal(
-          "0",
-          contractAfterTxFunds.toString(),
-          "Contract address showing incorrect balance after TX"
+          toBn(contractBalance),
+          0,
+          "Contract balance should be zero, it is NOT."
+        );
+      });
+    });
+
+    describe("Self Destruct", () => {
+      let currentOwner;
+      before(async () => {
+        currentOwner = await _contract.getContractOwner();
+      });
+
+      it("should fail when the contract is not stopped", async () => {
+        await catchRevert(_contract.selfDestruct({ from: currentOwner }));
+      });
+
+      const addedFunds = "100000000000000000"; // 1 ETH
+
+      it("should fail when sender address is NOT owner address", async () => {
+        await _contract.stopContract({ from: currentOwner });
+        await catchRevert(_contract.selfDestruct({ from: buyer }));
+      });
+
+      it("should withdraw all contract funds when sender address is owner", async () => {
+        // await _contract.stopContract({ from: currentOwner });
+        await web3.eth.sendTransaction({
+          from: buyer,
+          to: _contract.address,
+          value: addedFunds,
+        });
+        const ownerBeforeTxFunds = await getBalance(currentOwner);
+        const contractBeforeTxFunds = await getBalance(_contract.address);
+        const result = await _contract.selfDestruct({
+          from: currentOwner,
+        });
+        const ownerAfterTxFunds = await getBalance(currentOwner);
+        const gas = await getGas(result);
+
+        assert.equal(
+          ownerAfterTxFunds,
+          toBn(ownerBeforeTxFunds)
+            .add(toBn(contractBeforeTxFunds))
+            .sub(gas)
+            .toString(),
+          "Owner address showing incorrect balance after TX"
         );
       });
 
-      // it("should have a contract balance of 0", async () => {
-      //   const contractBalance = await getBalance(_contract.address);
-      //   assert.equal(
-      //     toBn(contractBalance),
-      //     0,
-      //     "Contract balance should be zero, it is NOT."
-      //   );
-      // });
+      it("should have a contract balance of 0", async () => {
+        const contractBalance = await getBalance(_contract.address);
+        assert.equal(
+          toBn(contractBalance),
+          0,
+          "Contract balance should be zero, it is NOT."
+        );
+      });
+
+      it("should have 0x bytecode", async () => {
+        const code = await web3.eth.getCode(_contract.address);
+        assert.equal(code, "0x", "Contract bytecode is not destroyed.");
+      });
     });
   });
 });
