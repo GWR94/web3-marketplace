@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const CourseMarketplace = artifacts.require("CourseMarketplace");
 const { catchRevert } = require("../utils/exceptions");
 
