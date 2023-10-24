@@ -1,3 +1,7 @@
 export default function List({ courses, children }) {
-  return <div>{courses.map((course) => children(course))}</div>;
+  return (
+    <div className="flex w-full">
+      {courses.map((course) => children(course))}
+    </div>
+  );
 }

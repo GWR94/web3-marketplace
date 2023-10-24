@@ -9,7 +9,7 @@ const Card = ({ course, disabled, Footer, state }) => {
   return (
     <div
       key={course.id}
-      className="bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl"
+      className="bg-white rounded-xl shadow-md overflow-hidden w-full"
     >
       <div className="flex h-full">
         <div className="flex-1 h-full next-image-wrapper">

@@ -4,7 +4,9 @@ import useSWR from "swr";
 const adminAddr = {
   // keccak256 hash for admin address
   "0x0e1d86e83e621484e573ac267f80e944ca6d845cf8b2660f2a58df6f92c74e97": true,
+  "0x37772ab0ddc39f49a3651a2dcb0e3a3d4d70f6c6b85914954257120cefb021a6": true,
 };
+
 export const handler = (web3, provider) => () => {
   const { data, mutate, ...rest } = useSWR(
     () => {
@@ -34,7 +36,7 @@ export const handler = (web3, provider) => () => {
       // remove listener when unmounted
       provider?.removeListener("accountsChanged", mutator);
     };
-  }, [mutate]);
+  }, [provider]);
 
   const checkAdmin = () => {
     const keccak = web3.utils.keccak256(data);

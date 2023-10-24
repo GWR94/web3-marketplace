@@ -14,16 +14,15 @@ module.exports = {
       provider: () =>
         new HDWalletProvider({
           mnemonic: {
-            phrase: keys.INFURA_MNEMONIC,
+            phrase: process.env.NEXT_INFURA_MNEMONIC,
           },
-          providerOrUrl: `wss://sepolia.infura.io/ws/v3/${keys.INFURA_PROJECT_ID}`,
+          providerOrUrl: `wss://sepolia.infura.io/ws/v3/${process.env.NEXT_INFURA_PROJECT_ID}`,
           addressIndex: 0,
         }),
-      network_id: 11155111, // Sepolia's network ID
-      gasPrice: 10000000000, // Set the gas price to an appropriate value
-      confirmations: 2, // Set the number of confirmations needed for a transaction
-      timeoutBlocks: 200, // Set the timeout for transactions
-      skipDryRun: true, // Skip the dry run option
+      network_id: "11155111",
+      gasPrice: 200000000000,
+      networkCheckoutTimeout: 10000,
+      timeoutBlocks: 200,
     },
   },
   // Configure your compilers

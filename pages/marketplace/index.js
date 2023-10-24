@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { CourseCard, CourseList } from "@components/ui/course";
 import { BaseLayout } from "@components/ui/layout";
 import { getAllCourses } from "@content/courses/fetcher";
@@ -7,6 +8,7 @@ import { OrderModal } from "@components/ui/order";
 import { useState } from "react";
 import { MarketHeader } from "@components/ui/marketplace";
 import { useWeb3 } from "@components/providers";
+import { withToast } from "@utils/toast";
 
 export default function Marketplace({ courses }) {
   const { web3, contract, requireInstall } = useWeb3();
@@ -16,7 +18,6 @@ export default function Marketplace({ courses }) {
   const [isNewPurchase, setNewPurchase] = useState(true);
 
   const purchaseCourse = async (order) => {
-    console.log(order);
     const hexCourseId = web3.utils.utf8ToHex(selectedCourse.id);
     const orderHash = web3.utils.soliditySha3(
       { type: "bytes16", value: hexCourseId },
@@ -24,16 +25,15 @@ export default function Marketplace({ courses }) {
     );
 
     const value = web3.utils.toWei(String(order.price));
-
     if (isNewPurchase) {
       const emailHash = web3.utils.sha3(order.email);
       const proof = web3.utils.soliditySha3(
         { type: "bytes32", value: emailHash },
         { type: "bytes32", value: orderHash }
       );
-      _purchaseCourse(hexCourseId, proof, value);
+      withToast(_purchaseCourse(hexCourseId, proof, value));
     } else {
-      _repurchaseCourse(orderHash, value);
+      withToast(_repurchaseCourse(orderHash, value));
     }
   };
 
@@ -42,10 +42,9 @@ export default function Marketplace({ courses }) {
       const res = await contract.methods
         .purchaseCourse(hexCourseId, proof)
         .send({ from: account.data, value });
-
-      console.log(res);
-    } catch {
-      console.error("Purchase course: Operation has failed.");
+      return res;
+    } catch (err) {
+      throw new Error(err.message);
     }
   };
 
@@ -54,9 +53,9 @@ export default function Marketplace({ courses }) {
       const res = await contract.methods
         .repurchaseCourse(courseHash)
         .send({ from: account.data, value });
-      console.log(res);
-    } catch {
-      console.error("Purchase course: Operation has failed.");
+      return res;
+    } catch (err) {
+      throw new Error(err.message);
     }
   };
 
@@ -98,9 +97,13 @@ export default function Marketplace({ courses }) {
                   );
                 }
                 if (!ownedCourses.hasInitialResponse) {
-                  return <div style={{ height: "50px" }} />;
+                  return (
+                    <Button size="sm" disabled variant="lightPurple">
+                      <Loader size="sm" />
+                    </Button>
+                  );
                 }
-
+                const isBusy = selectedCourse?.id === course.id;
                 if (owned) {
                   return owned.state === "deactivated" ? (
                     <Button
@@ -108,11 +111,12 @@ export default function Marketplace({ courses }) {
                         setNewPurchase(false);
                         setSelectedCourse(course);
                       }}
+                      disabled={isBusy}
                       size="sm"
                       className="ml-1"
                       variant="purple"
                     >
-                      Repurchase
+                      {isBusy ? "Repurchasing..." : "Repurchase"}
                     </Button>
                   ) : (
                     <Button
@@ -129,11 +133,11 @@ export default function Marketplace({ courses }) {
                 return (
                   <Button
                     onClick={() => setSelectedCourse(course)}
-                    disabled={!hasConnectedWallet}
+                    disabled={!hasConnectedWallet || isBusy}
                     size="sm"
                     variant="lightPurple"
                   >
-                    Purchase
+                    {isBusy ? "Purchasing..." : "Purchase"}
                   </Button>
                 );
               }}

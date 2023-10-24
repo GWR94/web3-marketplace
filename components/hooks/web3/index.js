@@ -26,6 +26,8 @@ const enhanceHook = (swrRes) => {
 
 export const useNetwork = () => {
   const swrRes = enhanceHook(useHooks((hooks) => hooks.useNetwork)());
+  // console.log(swrRes);
+
   return {
     network: swrRes,
   };
